@@ -1,0 +1,84 @@
+################################################################################
+# Render.com Deployment Configuration — PaddyCare AI
+# Docs: https://render.com/docs/blueprint-spec
+################################################################################
+
+services:
+  # ── Web Service (FastAPI) ────────────────────────────────────
+  - type: web
+    name: paddycare-api
+    runtime: python
+    region: singapore           # Closest region for India
+    plan: starter               # Free tier. Upgrade to standard for production.
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2
+    healthCheckPath: /health
+
+    # Persistent disk for uploads (not available on free tier — use external S3)
+    # disk:
+    #   name: paddycare-uploads
+    #   mountPath: /app/uploads
+    #   sizeGB: 10
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+      - key: APP_NAME
+        value: PaddyCare AI
+
+      - key: APP_VERSION
+        value: 1.0.0
+
+      - key: ENVIRONMENT
+        value: production
+
+      - key: DEBUG
+        value: "false"
+
+      # DATABASE_URL — set this in Render dashboard or use fromDatabase below
+      - key: DATABASE_URL
+        fromDatabase:
+          name: paddycare-mysql
+          property: connectionString
+
+      # Generate this with: openssl rand -hex 32
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: ALGORITHM
+        value: HS256
+
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "10080"
+
+      - key: OTP_BYPASS
+        value: "false"
+
+      - key: SMS_PROVIDER
+        value: fast2sms   # Change to your provider
+
+      - key: FAST2SMS_API_KEY
+        sync: false       # Set in Render dashboard (secret)
+
+      - key: MODEL_PATH
+        value: model/paddy_model.h5
+
+      - key: UPLOAD_DIR
+        value: uploads
+
+      - key: LOG_LEVEL
+        value: INFO
+
+      - key: ALLOWED_ORIGINS
+        value: "*"        # Restrict to your frontend domain in production
+
+
+  # ── MySQL Database (Comment out if using external MySQL) ─────
+  # Note: Render offers PostgreSQL natively. For MySQL, use PlanetScale or Aiven.
+  # Uncomment if using Render's PostgreSQL and change DATABASE_URL accordingly.
+  #
+  # databases:
+  #   - name: paddycare-db
+  #     databaseName: paddycare
+  #     user: paddycare

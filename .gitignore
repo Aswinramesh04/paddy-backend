@@ -1,0 +1,47 @@
+.venv/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Environment variables / secrets
+.env
+.env.*
+secrets.yml
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+.pytest_cache/
+.coverage
+
+# Logs and runtime files
+logs/
+*.log
+
+# Uploaded media / user-generated files
+uploads/
+
+# Docker
+docker-compose.override.yml
+
+# Optional: ignore model file if you don't intend to commit it
+# model/

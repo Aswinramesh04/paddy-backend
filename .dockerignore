@@ -1,0 +1,45 @@
+# Ignore local virtualenvs and Python cache
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Git and CI
+.git
+.gitignore
+
+# Local env files / secrets
+.env
+.env.*
+secrets.yml
+
+# Logs and uploads (avoid copying large runtime files into image)
+logs/
+uploads/
+*.log
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# Editor directories
+.vscode/
+.idea/
+.DS_Store
+
+# Tests
+tests/
+
+# If you want to include your model in the Docker image, remove 'model' from here
+# model/
+
+# Keep Dockerfile and app source only
+Dockerfile
+app/
+requirements.txt
+run.py
+render.yaml
+README.md
+.venv
