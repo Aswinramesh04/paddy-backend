@@ -35,11 +35,6 @@ tests/
 # If you want to include your model in the Docker image, remove 'model' from here
 # model/
 
-# Keep Dockerfile and app source only
-Dockerfile
-app/
-requirements.txt
-run.py
-render.yaml
-README.md
+# Keep Docker build context small; do NOT ignore the application source or Dockerfile.
+# (Ensure `Dockerfile`, `app/`, and `requirements.txt` are present in the build context.)
 .venv
