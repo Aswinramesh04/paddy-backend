@@ -43,10 +43,10 @@ def _build_disease_response(disease: Disease, db: Session) -> DiseaseDetailRespo
     return DiseaseDetailResponse(
         id=disease.id,
         class_index=disease.class_index,
-        name=disease.name,
-        name_ta=disease.name_ta,
-        name_hi=disease.name_hi,
-        name_te=disease.name_te,
+        english=disease.name,
+        tamil=disease.name_ta,
+        # Sinhala column may not exist in DB yet; use getattr to avoid attribute errors
+        sinhala=getattr(disease, "name_si", None),
         description=disease.description,
         symptoms=disease.symptoms,
         severity=disease.severity,

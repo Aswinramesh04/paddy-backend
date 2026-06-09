@@ -25,14 +25,15 @@ class UserUpdateRequest(BaseModel):
     def validate_language(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return v
-        allowed = {"en", "ta", "hi", "te"}
+        # Supported UI languages: English, Tamil, Sinhala
+        allowed = {"en", "ta", "si"}
         if v not in allowed:
-            raise ValueError(f"Language must be one of: {', '.join(allowed)}")
+            raise ValueError(f"Language must be one of: {', '.join(sorted(allowed))}")
         return v
 
     model_config = {
-        "json_schema_extra": {
-            "examples": [{"name": "Ramesh Kumar", "language": "ta", "dark_mode": False}]
+            "json_schema_extra": {
+                "examples": [{"name": "Ramesh Kumar", "language": "ta", "dark_mode": False}]
         }
     }
 
