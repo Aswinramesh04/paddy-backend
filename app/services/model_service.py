@@ -134,7 +134,9 @@ class ModelService:
 
     @property
     def is_loaded(self) -> bool:
-        return self._loaded and self._model is not None
+        return self._loaded and (
+            (self._model is not None) or (getattr(self, "_interpreter", None) is not None)
+        )
 
     def predict(
         self, preprocessed_image: np.ndarray
