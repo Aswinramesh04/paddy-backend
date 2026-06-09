@@ -155,7 +155,8 @@ def root():
 
 
 # Temporary debug endpoint to inspect model state on the server.
-@app.get("/debug/model-status", include_in_schema=False)
+# Included in OpenAPI so deployed Swagger can show it (still returns 404 in prod).
+@app.get("/debug/model-status", include_in_schema=True)
 def debug_model_status():
     # Only exposed in non-production environments
     if settings.ENVIRONMENT.lower() == "production":
