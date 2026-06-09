@@ -70,12 +70,44 @@ class ModelService:
 
     def load(self) -> None:
         """Load the model from disk. Prefer lightweight TFLite runtime if available."""
-        model_path = Path(settings.MODEL_PATH)
+        # Normalize and try multiple candidate locations for the model file.
+        requested = Path(settings.MODEL_PATH)
+        candidates: List[Path] = [requested]
+        # If user provided only a basename (e.g. 'paddy_model.tflite'), check 'model/' folder
+        if requested.name == str(requested):
+            candidates.append(Path("model") / requested.name)
+        # Also check if they provided a path without the 'model/' prefix
+        if not str(requested).startswith("model/"):
+            candidates.append(Path("model") / str(requested))
 
-        if not model_path.exists():
+        model_path: Optional[Path] = None
+        for c in candidates:
+            try:
+                if c.exists():
+                    model_path = c
+                    break
+            except Exception:
+                continue
+
+        # If not found on disk, attempt to download from MODEL_URL (if configured)
+        if model_path is None and settings.MODEL_URL:
+            try:
+                import urllib.request
+
+                dest_dir = Path("model")
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                dest_file = dest_dir / Path(settings.MODEL_URL).name
+                log.info(f"Model not found locally; attempting to download from {settings.MODEL_URL} ...")
+                urllib.request.urlretrieve(settings.MODEL_URL, str(dest_file))
+                log.info(f"Downloaded model to {dest_file}")
+                model_path = dest_file
+            except Exception as exc:  # pragma: no cover - network behavior
+                log.error(f"Failed to download model from MODEL_URL: {exc}")
+
+        if model_path is None:
             log.warning(
-                f"Model file not found at '{model_path}'. "
-                "Place your model at this path and restart. "
+                f"Model file not found at any of: {candidates}. "
+                "Place your model at one of these paths and restart. "
                 "Scan endpoint will return 503 until model is loaded."
             )
             return

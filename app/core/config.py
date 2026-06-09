@@ -72,6 +72,8 @@ class Settings(BaseSettings):
     MODEL_PATH: str = "model/paddy_model.h5"
     MODEL_INPUT_SIZE: int = 224
     MODEL_CONFIDENCE_THRESHOLD: float = 0.5
+    # Optional URL to download the model at startup if not present in the image
+    MODEL_URL: str = ""
 
     # Clean common misconfiguration where an env var was set as "MODEL_PATH=..."
     @field_validator("MODEL_PATH", mode="before")
