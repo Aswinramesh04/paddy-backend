@@ -73,6 +73,17 @@ class Settings(BaseSettings):
     MODEL_INPUT_SIZE: int = 224
     MODEL_CONFIDENCE_THRESHOLD: float = 0.5
 
+    # Clean common misconfiguration where an env var was set as "MODEL_PATH=..."
+    @field_validator("MODEL_PATH", mode="before")
+    def _sanitize_model_path(cls, v):
+        try:
+            if isinstance(v, str) and "=" in v:
+                # Some hosts allow entering NAME=VALUE as the value; handle that gracefully
+                return v.split("=", 1)[1].strip()
+        except Exception:
+            pass
+        return v
+
     # ── CORS ──────────────────────────────────────────────────
     ALLOWED_ORIGINS: str = "*"
 
