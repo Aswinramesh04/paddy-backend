@@ -69,7 +69,7 @@ class ModelService:
         return cls._instance
 
     def load(self) -> None:
-        """Load the model from disk. Called once at startup."""
+        """Load the model from disk. Prefer lightweight TFLite runtime if available."""
         model_path = Path(settings.MODEL_PATH)
 
         if not model_path.exists():
@@ -80,9 +80,37 @@ class ModelService:
             )
             return
 
+        # Try TFLite runtime first (small memory footprint)
+        try:
+            try:
+                from tflite_runtime.interpreter import Interpreter  # type: ignore
+            except Exception:
+                # Fallback to package name if installed as 'tensorflow.lite'
+                from tensorflow.lite.python.interpreter import Interpreter  # type: ignore
+
+            log.info(f"Loading TFLite model from '{model_path}' ...")
+            self._interpreter = Interpreter(model_path=str(model_path))
+            self._interpreter.allocate_tensors()
+            self._is_tflite = True
+            self._loaded = True
+            # Determine output size by reading tensor details
+            out_details = self._interpreter.get_output_details()
+            out_shape = tuple(out_details[0]["shape"]) if out_details else (1, NUM_CLASSES)
+            if out_shape[-1] != NUM_CLASSES:
+                log.error(
+                    f"TFLite model output shape {out_shape} does not match expected {NUM_CLASSES} classes!"
+                )
+                self._loaded = False
+                return
+            log.info(f"TFLite model loaded. Output shape: {out_shape}. Classes: {NUM_CLASSES}.")
+            return
+        except Exception as exc:
+            log.debug(f"TFLite runtime not available or failed to load model: {exc}")
+
+        # Fall back to full TensorFlow if available (useful for local dev)
         try:
             import tensorflow as tf  # type: ignore
-            log.info(f"Loading model from '{model_path}' ...")
+            log.info(f"Loading TensorFlow Keras model from '{model_path}' ...")
             self._model = tf.keras.models.load_model(str(model_path))
             self._loaded = True
 
@@ -97,7 +125,7 @@ class ModelService:
                 return
 
             log.info(
-                f"Model loaded. Output shape: {out_shape}. "
+                f"TensorFlow model loaded. Output shape: {out_shape}. "
                 f"Classes: {NUM_CLASSES}. Version: {self._model_version}"
             )
         except Exception as exc:
@@ -124,10 +152,23 @@ class ModelService:
             raise ModelNotLoadedException()
 
         start = time.perf_counter()
-        raw_preds = self._model.predict(preprocessed_image, verbose=0)  # type: ignore
-        elapsed_ms = (time.perf_counter() - start) * 1000
-
-        probabilities: np.ndarray = raw_preds[0]
+        probabilities: np.ndarray
+        if getattr(self, "_is_tflite", False):
+            # TFLite inference path
+            input_details = self._interpreter.get_input_details()
+            # assume single input
+            idx = input_details[0]["index"]
+            # TFLite expects np.float32
+            self._interpreter.set_tensor(idx, preprocessed_image.astype(np.float32))
+            self._interpreter.invoke()
+            out_details = self._interpreter.get_output_details()
+            raw_preds = self._interpreter.get_tensor(out_details[0]["index"])  # type: ignore
+            elapsed_ms = (time.perf_counter() - start) * 1000
+            probabilities = np.array(raw_preds[0])
+        else:
+            raw_preds = self._model.predict(preprocessed_image, verbose=0)  # type: ignore
+            elapsed_ms = (time.perf_counter() - start) * 1000
+            probabilities = raw_preds[0]
 
         predicted_idx = int(np.argmax(probabilities))
         confidence = float(probabilities[predicted_idx])
@@ -154,6 +195,19 @@ class ModelService:
         """Return full 10-class probability vector as JSON string for DB storage."""
         if not self.is_loaded:
             return "{}"
+        if getattr(self, "_is_tflite", False):
+            input_details = self._interpreter.get_input_details()
+            idx = input_details[0]["index"]
+            self._interpreter.set_tensor(idx, preprocessed_image.astype(np.float32))
+            self._interpreter.invoke()
+            out_details = self._interpreter.get_output_details()
+            raw_preds = self._interpreter.get_tensor(out_details[0]["index"])  # type: ignore
+            probs = {
+                DISEASE_CLASSES[i]: round(float(raw_preds[0][i]), 6)
+                for i in range(NUM_CLASSES)
+            }
+            return json.dumps(probs)
+
         raw_preds = self._model.predict(preprocessed_image, verbose=0)  # type: ignore
         probs = {
             DISEASE_CLASSES[i]: round(float(raw_preds[0][i]), 6)
