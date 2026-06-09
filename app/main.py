@@ -152,3 +152,31 @@ def root():
         "docs": "/docs",
         "health": "/health",
     }
+
+
+# Temporary debug endpoint to inspect model state on the server.
+@app.get("/debug/model-status", include_in_schema=False)
+def debug_model_status():
+    # Only exposed in non-production environments
+    if settings.ENVIRONMENT.lower() == "production":
+        return JSONResponse(status_code=404, content={"detail": "Not found"})
+
+    model_path = Path(settings.MODEL_PATH)
+    exists = model_path.exists()
+    size = None
+    try:
+        size = model_path.stat().st_size if exists else None
+    except Exception:
+        size = None
+
+    interpreter_present = getattr(model_service, "_interpreter", None) is not None
+    keras_present = getattr(model_service, "_model", None) is not None
+
+    return {
+        "model_path": str(model_path),
+        "exists": exists,
+        "size_bytes": size,
+        "model_service_is_loaded": model_service.is_loaded,
+        "interpreter_present": bool(interpreter_present),
+        "keras_model_present": bool(keras_present),
+    }
