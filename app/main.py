@@ -55,11 +55,12 @@ app = FastAPI(
         "PaddyCare AI — REST API for paddy disease detection, "
         "treatment recommendations, and nearby agro shop discovery.\n\n"
         "**Authentication:** All endpoints (except /auth/*) require a Bearer JWT token.\n\n"
-        "**Quick Start:**\n"
-        "1. `POST /api/v1/auth/send-otp` with your phone number\n"
-        "2. `POST /api/v1/auth/verify-otp` to get your token\n"
-        "3. Include `Authorization: Bearer <token>` in all subsequent requests\n\n"
-        "**Dev OTP bypass:** Set `OTP_BYPASS=true` and use code `123456`."
+        "**Quick Start (email/password):**\n"
+        "1. `POST /api/v1/auth/register` with `{ email, password, name }` to create an account.\n"
+        "2. `POST /api/v1/auth/login` with `{ email, password }` to receive `access_token` and `refresh_token`.\n"
+        "3. Include header `Authorization: Bearer <access_token>` in all subsequent requests.\n"
+        "4. When access token expires call `POST /api/v1/auth/refresh` with `{ refresh_token }` to get a new token pair.\n\n"
+        "**Dev notes:** Password reset via `POST /api/v1/auth/password-reset/request` and `POST /api/v1/auth/password-reset/confirm`."
     ),
     docs_url="/docs",
     redoc_url="/redoc",
