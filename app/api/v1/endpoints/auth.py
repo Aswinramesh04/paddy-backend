@@ -1,8 +1,7 @@
-"""
-Authentication endpoints.
+"""Authentication endpoints.
 
-POST /auth/send-otp      → Send OTP to phone number
-POST /auth/verify-otp    → Verify OTP and receive JWT tokens
+POST /auth/register      → Register with email/password
+POST /auth/login         → Login with email/password
 POST /auth/refresh       → Refresh access token
 POST /auth/guest         → Issue limited guest token
 """
@@ -15,78 +14,96 @@ if "app" not in sys.modules:
     if _project_root not in sys.path:
         sys.path.insert(0, _project_root)
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
 from app.core.security import get_user_id_from_token
+from app.core.config import settings
 from app.db.database import get_db
 from app.schemas.auth import (
     RefreshTokenRequest,
-    SendOTPRequest,
-    SendOTPResponse,
     TokenResponse,
-    VerifyOTPRequest,
 )
+from app.schemas.auth import RegisterRequest, LoginRequest, PasswordResetRequest, PasswordResetConfirmRequest
 from app.schemas.common import SuccessResponse
 from app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+
+
 @router.post(
-    "/send-otp",
-    response_model=SuccessResponse[SendOTPResponse],
-    status_code=status.HTTP_200_OK,
-    summary="Send OTP to mobile number",
-    description=(
-        "Sends a one-time password to the given phone number via SMS. "
-        "If the number is new, a user account is automatically created. "
-        "OTP expires after the configured timeout (default 10 minutes)."
-    ),
+    "/register",
+    response_model=SuccessResponse[TokenResponse],
+    status_code=status.HTTP_201_CREATED,
+    summary="Register with email and password",
 )
-async def send_otp(
-    payload: SendOTPRequest,
+def register(
+    payload: RegisterRequest,
     db: Session = Depends(get_db),
 ):
-    await AuthService.send_otp(db, payload.phone)
+    user, access_token, refresh_token = AuthService.register_user(db, payload.email, payload.password, payload.name)
     return SuccessResponse(
-        message="OTP sent successfully.",
-        data=SendOTPResponse(
-            message="OTP has been sent to your mobile number.",
-            phone=payload.phone,
-            expires_in_minutes=settings.OTP_EXPIRE_MINUTES,
+        message="Registration successful.",
+        data=TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         ),
     )
 
 
 @router.post(
-    "/verify-otp",
+    "/login",
     response_model=SuccessResponse[TokenResponse],
     status_code=status.HTTP_200_OK,
-    summary="Verify OTP and receive JWT tokens",
-    description=(
-        "Verifies the OTP submitted by the user. "
-        "On success, returns access and refresh tokens. "
-        "Pass `name` on first-time login to set the user's display name."
-    ),
+    summary="Login with email and password",
 )
-def verify_otp(
-    payload: VerifyOTPRequest,
+def login(
+    payload: LoginRequest,
     db: Session = Depends(get_db),
 ):
-    user, access_token, refresh_token, is_new = AuthService.verify_otp_and_login(
-        db, payload.phone, payload.otp, payload.name
-    )
+    user, access_token, refresh_token = AuthService.login_with_password(db, payload.email, payload.password)
     return SuccessResponse(
         message="Login successful.",
         data=TokenResponse(
             access_token=access_token,
             refresh_token=refresh_token,
             expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-            is_new_user=is_new,
         ),
     )
+
+
+@router.post(
+    "/password-reset/request",
+    response_model=SuccessResponse[dict],
+    status_code=status.HTTP_200_OK,
+    summary="Request password reset",
+)
+def password_reset_request(
+    payload: "PasswordResetRequest",  # type: ignore
+    db: Session = Depends(get_db),
+):
+    # Always return success to avoid user enumeration
+    token = AuthService.create_password_reset(db, payload.email)
+    return SuccessResponse(message="If an account exists, a password reset email has been sent.", data={})
+
+
+@router.post(
+    "/password-reset/confirm",
+    response_model=SuccessResponse[dict],
+    status_code=status.HTTP_200_OK,
+    summary="Confirm password reset",
+)
+def password_reset_confirm(
+    payload: "PasswordResetConfirmRequest",  # type: ignore
+    db: Session = Depends(get_db),
+):
+    ok = AuthService.confirm_password_reset(db, payload.token, payload.new_password)
+    if not ok:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token.")
+    return SuccessResponse(message="Password has been reset.", data={})
 
 
 @router.post(

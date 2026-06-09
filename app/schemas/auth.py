@@ -56,6 +56,23 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str
 
 
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: Optional[str] = None
+
+    model_config = {
+        "json_schema_extra": {"examples": [{"email": "user@example.com", "password": "s3cret", "name": "Ramesh"}]}
+    }
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+    model_config = {"json_schema_extra": {"examples": [{"email": "user@example.com", "password": "s3cret"}]}}
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
@@ -70,3 +87,16 @@ class SendOTPResponse(BaseModel):
     message: str
     phone: str
     expires_in_minutes: int
+
+
+class PasswordResetRequest(BaseModel):
+    email: str
+
+
+class PasswordResetConfirmRequest(BaseModel):
+    token: str
+    new_password: str
+
+
+class PasswordResetResponse(BaseModel):
+    message: str

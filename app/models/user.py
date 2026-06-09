@@ -13,7 +13,9 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    phone: Mapped[str] = mapped_column(String(15), unique=True, index=True, nullable=False)
+    phone: Mapped[str] = mapped_column(String(15), unique=True, index=True, nullable=True)
+    email: Mapped[str | None] = mapped_column(String(254), unique=True, index=True, nullable=True)
+    password_hash: Mapped[str | None] = mapped_column(String(256), nullable=True)
     name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
@@ -35,8 +37,8 @@ class User(Base):
     predictions: Mapped[list["Prediction"]] = relationship(  # noqa: F821
         "Prediction", back_populates="user", cascade="all, delete-orphan"
     )
-    otps: Mapped[list["OTP"]] = relationship(  # noqa: F821
-        "OTP", back_populates="user", cascade="all, delete-orphan"
+    password_resets: Mapped[list["PasswordReset"]] = relationship(  # noqa: F821
+        "PasswordReset", back_populates="user", cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:

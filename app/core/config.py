@@ -43,6 +43,8 @@ class Settings(BaseSettings):
     OTP_LENGTH: int = 6
     OTP_BYPASS: bool = False
     OTP_BYPASS_CODE: str = "123456"
+    # Toggle OTP endpoints and behavior (useful to decommission SMS OTP without removing code)
+    OTP_ENABLED: bool = False
 
     # ── SMS ───────────────────────────────────────────────────
     SMS_PROVIDER: str = "console"      # console | fast2sms | twilio | msg91
@@ -50,6 +52,16 @@ class Settings(BaseSettings):
     TWILIO_ACCOUNT_SID: str = ""
     TWILIO_AUTH_TOKEN: str = ""
     TWILIO_PHONE_NUMBER: str = ""
+
+    # ── Email / SMTP ──────────────────────────────────────────
+    EMAIL_PROVIDER: str = "console"    # console | smtp
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASS: str = ""
+    EMAIL_FROM: str = "no-reply@paddycare.ai"
+    # ── Password reset ────────────────────────────────────────
+    PASSWORD_RESET_EXPIRE_MINUTES: int = 60
 
     # ── File Upload ───────────────────────────────────────────
     UPLOAD_DIR: str = "uploads"

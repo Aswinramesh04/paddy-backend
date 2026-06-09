@@ -39,7 +39,7 @@ class UserUpdateRequest(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
-    phone: str
+    phone: Optional[str] = None
     name: Optional[str]
     language: str
     is_verified: bool

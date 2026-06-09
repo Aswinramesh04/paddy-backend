@@ -1,6 +1,5 @@
-"""
-Authentication service.
-Handles OTP generation, verification, and token issuance.
+"""Authentication service.
+Handles user registration, password login, token refresh and password reset flow.
 """
 from __future__ import annotations
 
@@ -10,133 +9,112 @@ from typing import Tuple
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.exceptions import (
-    InvalidOTPException,
-    OTPExpiredException,
-    SMSDeliveryException,
-)
 from app.core.logging import get_logger
-from app.core.security import (
-    create_access_token,
-    create_refresh_token,
-    generate_otp,
-    hash_otp,
-    verify_otp,
-)
-from app.models.otp import OTP
+from app.core.security import create_access_token, create_refresh_token
+from app.core.security import hash_password, verify_password
+from app.models.password_reset import PasswordReset
+import secrets
+from datetime import timedelta
+from app.utils.email_utils import send_email
 from app.models.user import User
-from app.utils.otp_utils import send_otp_sms
+from app.core.exceptions import UnauthorizedException, ConflictException
 
 log = get_logger(__name__)
 
 
 class AuthService:
-
     @staticmethod
-    def get_or_create_user(db: Session, phone: str) -> Tuple[User, bool]:
-        """
-        Fetch existing user or create a new one.
-        Returns (user, is_new_user).
-        """
-        user = db.query(User).filter(User.phone == phone).first()
-        if user:
-            return user, False
-
-        user = User(phone=phone, is_active=True, is_verified=False)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-        log.info(f"New user created: phone={phone} id={user.id}")
-        return user, True
-
-    @staticmethod
-    async def send_otp(db: Session, phone: str) -> str:
-        """
-        Generate OTP, persist hashed version, and dispatch SMS.
-        Returns the plain OTP (only used in test mode).
-        """
-        user, _ = AuthService.get_or_create_user(db, phone)
-
-        db.query(OTP).filter(OTP.user_id == user.id, OTP.is_used == False).delete()  # noqa: E712
-        db.flush()
-
-        if settings.OTP_BYPASS:
-            plain_otp = settings.OTP_BYPASS_CODE
-            log.info(f"[OTP BYPASS] Using code {plain_otp} for {phone}")
-        else:
-            plain_otp = generate_otp()
-
-        otp_record = OTP(
-            user_id=user.id,
-            otp_hash=hash_otp(plain_otp),
-            expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.OTP_EXPIRE_MINUTES),
-            is_used=False,
-        )
-        db.add(otp_record)
-        db.commit()
-
-        if not settings.OTP_BYPASS:
-            await send_otp_sms(phone, plain_otp)
-
-        return plain_otp
-
-    @staticmethod
-    def verify_otp_and_login(
-        db: Session, phone: str, plain_otp: str, name: str | None = None
-    ) -> Tuple[User, str, str, bool]:
-        """
-        Verify OTP, mark user as verified, issue tokens.
-
-        Returns: (user, access_token, refresh_token, is_new_user)
-        Raises: InvalidOTPException | OTPExpiredException
-        """
-        user = db.query(User).filter(User.phone == phone).first()
-        if not user:
-            raise InvalidOTPException()
-
-        otp_record = (
-            db.query(OTP)
-            .filter(OTP.user_id == user.id, OTP.is_used == False)  # noqa: E712
-            .order_by(OTP.created_at.desc())
-            .first()
-        )
-
-        if not otp_record:
-            raise InvalidOTPException()
-
-        now = datetime.now(timezone.utc)
-        if otp_record.expires_at.replace(tzinfo=timezone.utc) < now:
-            raise OTPExpiredException()
-
-        if not verify_otp(plain_otp, otp_record.otp_hash):
-            raise InvalidOTPException()
-
-        # Mark OTP used
-        otp_record.is_used = True
-        otp_record.verified_at = now
-
-        is_new_user = not user.is_verified
-
-        # Update user
-        user.is_verified = True
-        if name and not user.name:
-            user.name = name
-
-        db.commit()
-        db.refresh(user)
-
-        access_token = create_access_token(user.id, user.phone)
-        refresh_token = create_refresh_token(user.id)
-
-        log.info(f"User logged in: id={user.id} phone={phone} new={is_new_user}")
-        return user, access_token, refresh_token, is_new_user
+    def _get_user_by_email(db: Session, email: str) -> User | None:
+        return db.query(User).filter(User.email == email).first()
 
     @staticmethod
     def refresh_tokens(db: Session, user_id: int) -> Tuple[str, str]:
         user = db.query(User).filter(User.id == user_id).first()
         if not user or not user.is_active:
-            from app.core.exceptions import UnauthorizedException
             raise UnauthorizedException()
         access_token = create_access_token(user.id, user.phone)
         refresh_token = create_refresh_token(user.id)
         return access_token, refresh_token
+
+    @staticmethod
+    def register_user(db: Session, email: str, password: str, name: str | None = None) -> Tuple[User, str, str]:
+        """Create a new user with email/password and return user and tokens."""
+        existing = db.query(User).filter(User.email == email).first()
+        if existing:
+            from app.core.exceptions import ConflictException
+            raise ConflictException(message="User with this email already exists.")
+
+        user = User(email=email, name=name, is_active=True, is_verified=True)
+        user.password_hash = hash_password(password)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        access_token = create_access_token(user.id, user.phone or user.email or "")
+        refresh_token = create_refresh_token(user.id)
+        return user, access_token, refresh_token
+
+    @staticmethod
+    def login_with_password(db: Session, email: str, password: str) -> Tuple[User, str, str]:
+        """Authenticate user by email/password and return user + tokens."""
+        user = db.query(User).filter(User.email == email).first()
+        if not user or not user.password_hash:
+            raise UnauthorizedException()
+
+        if not verify_password(password, user.password_hash):
+            raise UnauthorizedException()
+
+        access_token = create_access_token(user.id, user.phone or user.email or "")
+        refresh_token = create_refresh_token(user.id)
+        return user, access_token, refresh_token
+
+    @staticmethod
+    def create_password_reset(db: Session, email: str) -> str:
+        """Create a password reset token and send it via email. Returns token (for testing)."""
+        user = AuthService._get_user_by_email(db, email)
+        if not user:
+            # Do not reveal whether user exists
+            return ""
+
+        # Invalidate existing tokens for user
+        db.query(PasswordReset).filter(PasswordReset.user_id == user.id, PasswordReset.is_used == False).update({
+            "is_used": True
+        })
+
+        token = secrets.token_urlsafe(32)
+        expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES)
+        pr = PasswordReset(user_id=user.id, token=token, expires_at=expires_at, is_used=False)
+        db.add(pr)
+        db.commit()
+
+        # send email
+        reset_link = f"https://your-frontend.example/reset-password?token={token}"
+        subject = "PaddyCare AI — Password reset"
+        body = f"You requested a password reset. Use this link to reset your password: {reset_link}\nIf you didn't request this, ignore."
+        try:
+            send_email(user.email, subject, body)
+        except Exception:
+            # Log and swallow; do not fail flow
+            log.exception("Failed to send password reset email")
+
+        return token
+
+    @staticmethod
+    def confirm_password_reset(db: Session, token: str, new_password: str) -> bool:
+        """Validate reset token and set new password. Returns True on success."""
+        pr = db.query(PasswordReset).filter(PasswordReset.token == token).first()
+        if not pr or pr.is_used:
+            return False
+
+        now = datetime.now(timezone.utc)
+        if pr.expires_at.replace(tzinfo=timezone.utc) < now:
+            return False
+
+        user = db.query(User).filter(User.id == pr.user_id).first()
+        if not user:
+            return False
+
+        user.password_hash = hash_password(new_password)
+        pr.is_used = True
+        db.commit()
+        return True

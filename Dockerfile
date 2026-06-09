@@ -34,6 +34,8 @@ COPY --from=builder /install /usr/local
 # Copy application source
 COPY app/ ./app/
 COPY .env* ./
+# Copy ML model into image (ensure model/paddy_model.h5 present in repo)
+COPY model/ model/
 
 # Create required directories
 RUN mkdir -p uploads logs model
