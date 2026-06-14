@@ -54,14 +54,16 @@ class Settings(BaseSettings):
     TWILIO_PHONE_NUMBER: str = ""
 
     # ── Email / SMTP ──────────────────────────────────────────
-    EMAIL_PROVIDER: str = "console"    # console | smtp
-    SMTP_HOST: str = ""
+    EMAIL_PROVIDER: str = "smtp"    # console | smtp
+    SMTP_HOST: str = "smtp.gmail.com"
     SMTP_PORT: int = 587
-    SMTP_USER: str = ""
-    SMTP_PASS: str = ""
-    EMAIL_FROM: str = "no-reply@paddycare.ai"
+    SMTP_USER: str = "aswinramesh04@gmail.com"
+    SMTP_PASS: str = "xhsx ezkn hctl gmie"
+    EMAIL_FROM: str = "aswinramesh04@gmail.com"
     # ── Password reset ────────────────────────────────────────
     PASSWORD_RESET_EXPIRE_MINUTES: int = 60
+    # Frontend URL used in password reset emails. Set to your frontend origin.
+    FRONTEND_URL: str = "https://paddy-care-ai.netlify.app/"
 
     # ── File Upload ───────────────────────────────────────────
     UPLOAD_DIR: str = "uploads"

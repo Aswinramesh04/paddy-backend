@@ -73,7 +73,6 @@ class AuthService:
         """Create a password reset token and send it via email. Returns token (for testing)."""
         user = AuthService._get_user_by_email(db, email)
         if not user:
-            # Do not reveal whether user exists
             return ""
 
         # Invalidate existing tokens for user
@@ -87,8 +86,8 @@ class AuthService:
         db.add(pr)
         db.commit()
 
-        # send email
-        reset_link = f"https://your-frontend.example/reset-password?token={token}"
+        # send email (use configured frontend URL)
+        reset_link = f"{settings.FRONTEND_URL.rstrip('/')}" + f"/reset-password?token={token}"
         subject = "PaddyCare AI — Password reset"
         body = f"You requested a password reset. Use this link to reset your password: {reset_link}\nIf you didn't request this, ignore."
         try:
