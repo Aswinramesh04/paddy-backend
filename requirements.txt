@@ -47,6 +47,7 @@ slowapi==0.1.9
 
 psycopg2-binary
 transformers
+torch
 sentencepiece
 
 requests

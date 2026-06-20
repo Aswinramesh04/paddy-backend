@@ -2,6 +2,7 @@
 
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
+import torch
 
 class ClipService:
     def __init__(self):
