@@ -1,6 +1,9 @@
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
 import torch
+import os
+
+os.makedirs("/app/.cache/huggingface", exist_ok=True)
 
 
 class ClipService:
@@ -11,11 +14,13 @@ class ClipService:
     def load(self):
         if self.model is None:
             self.model = CLIPModel.from_pretrained(
-                "openai/clip-vit-base-patch32"
+                "openai/clip-vit-base-patch32",
+                cache_dir="/app/.cache/huggingface"
             )
 
             self.processor = CLIPProcessor.from_pretrained(
-                "openai/clip-vit-base-patch32"
+                "openai/clip-vit-base-patch32",
+                cache_dir="/app/.cache/huggingface"
             )
 
     def is_paddy_leaf(

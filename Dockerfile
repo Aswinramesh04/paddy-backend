@@ -43,6 +43,12 @@ RUN mkdir -p uploads logs model
 # Non-root user for security
 RUN addgroup --system paddycare && adduser --system --ingroup paddycare paddycare
 RUN chown -R paddycare:paddycare /app
+RUN mkdir -p /app/.cache/huggingface
+RUN chown -R paddycare:paddycare /app/.cache
+
+ENV HF_HOME=/app/.cache/huggingface
+ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
+ENV HOME=/app
 USER paddycare
 
 # Expose port
