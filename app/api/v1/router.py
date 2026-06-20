@@ -7,6 +7,7 @@ from app.api.v1.endpoints.history import router as history_router
 from app.api.v1.endpoints.predictions import router as predictions_router
 from app.api.v1.endpoints.shops import router as shops_router
 from app.api.v1.endpoints.users import router as users_router
+from app.api.v1.endpoints.weather import router as weather_router
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -16,3 +17,4 @@ api_router.include_router(predictions_router)
 api_router.include_router(history_router)
 api_router.include_router(diseases_router)
 api_router.include_router(shops_router)
+api_router.include_router(weather_router)

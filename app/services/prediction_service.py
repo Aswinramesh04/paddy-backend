@@ -12,9 +12,11 @@ from fastapi import Request
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.config import settings
+from app.core.exceptions import InvalidPaddyImageException
 from app.core.logging import get_logger
 from app.models.disease import Disease, PreventionTip, Recommendation
 from app.models.prediction import Prediction
+from app.services.clip_service import clip_service
 from app.schemas.prediction import (
     ClassProbability,
     DiseaseOut,
@@ -51,6 +53,11 @@ class PredictionService:
         # 1. Preprocess
         tensor = preprocess_image_from_path(image_path)
 
+        
+        if not clip_service.is_paddy_leaf(image_path):
+            raise InvalidPaddyImageException(
+                "Please upload a clear paddy leaf image."
+            )
         # 2. Inference
         predicted_class, confidence, top_probs, elapsed_ms = model_service.predict(tensor)
         all_probs_json = json.dumps({p["class_name"]: p["probability"] for p in top_probs})

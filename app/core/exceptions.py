@@ -137,3 +137,7 @@ class SMSDeliveryException(PaddyCareException):
     status_code = 503
     error_code = "SMS_DELIVERY_FAILED"
     message = "Failed to send OTP via SMS. Please try again."
+
+class InvalidPaddyImageException(BadRequestException):
+    error_code = "INVALID_PADDY_IMAGE"
+    message = "Please upload a clear paddy leaf image."
