@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     # ── SMS ───────────────────────────────────────────────────
     SMS_PROVIDER: str = "console"      # console | fast2sms | twilio | msg91
     FAST2SMS_API_KEY: str = ""
+
+    # ── Weather ───────────────────────────────────────────────
+    OPENWEATHER_API_KEY: str = ""
     TWILIO_ACCOUNT_SID: str = ""
     TWILIO_AUTH_TOKEN: str = ""
     TWILIO_PHONE_NUMBER: str = ""

@@ -3,7 +3,27 @@ from transformers import CLIPProcessor, CLIPModel
 import torch
 import os
 
-os.makedirs("/app/.cache/huggingface", exist_ok=True)
+
+def get_cache_dir() -> str:
+    for env_var in ("HF_HOME", "HUGGINGFACE_HUB_CACHE"):
+        value = os.getenv(env_var)
+        if value:
+            return value
+
+    home_dir = os.path.expanduser("~")
+    if home_dir:
+        return os.path.join(home_dir, ".cache", "huggingface")
+
+    return os.path.join(os.getcwd(), ".cache", "huggingface")
+
+
+CACHE_DIR = get_cache_dir()
+try:
+    os.makedirs(CACHE_DIR, exist_ok=True)
+except OSError:
+    fallback_dir = os.path.join(os.path.expanduser("~") or os.getcwd(), ".cache", "huggingface")
+    os.makedirs(fallback_dir, exist_ok=True)
+    CACHE_DIR = fallback_dir
 
 
 class ClipService:
@@ -15,12 +35,12 @@ class ClipService:
         if self.model is None:
             self.model = CLIPModel.from_pretrained(
                 "openai/clip-vit-base-patch32",
-                cache_dir="/app/.cache/huggingface"
+                cache_dir=CACHE_DIR
             )
 
             self.processor = CLIPProcessor.from_pretrained(
                 "openai/clip-vit-base-patch32",
-                cache_dir="/app/.cache/huggingface"
+                cache_dir=CACHE_DIR
             )
 
     def is_paddy_leaf(
