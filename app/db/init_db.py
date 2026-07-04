@@ -46,8 +46,7 @@ DISEASE_SEED = [
         "class_index": 0,
         "name": "Bacterial Leaf Blight",
         "name_ta": "பாக்டீரியா இலை கருகல்",
-        "name_hi": "बैक्टीरियल लीफ ब्लाइट",
-        "name_te": "బాక్టీరియల్ లీఫ్ బ్లైట్",
+        "name_si": "බැක්ටීරියල් කොළ කැළල",
         "description": (
             "Bacterial Leaf Blight (BLB) is caused by Xanthomonas oryzae pv. oryzae. "
             "It is one of the most destructive diseases of rice, especially in tropical "
@@ -63,7 +62,7 @@ DISEASE_SEED = [
         "recommendations": [
             {
                 "medicine_name": "Copper Oxychloride 50% WP",
-                "dosage": "3g per litre of water",
+                "dosage": "3g per litre of water, approx. 600g per acre (200L spray)",
                 "how_to_use": "Spray on both sides of leaves. Repeat after 7–10 days.",
                 "benefits": "Effective bactericide. Prevents spread to healthy plants. Protects vascular tissue.",
                 "precautions": "Do not mix with alkaline pesticides. Wear gloves and mask. Avoid spraying in strong wind.",
@@ -73,7 +72,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Streptomycin Sulphate 90% SP",
-                "dosage": "0.5g per litre of water",
+                "dosage": "0.5g per litre of water, approx. 100g per acre (200L spray)",
                 "how_to_use": "Mix well and spray uniformly on affected plants. Use 2–3 times at weekly intervals.",
                 "benefits": "Antibiotic action. Rapidly controls bacterial spread. Systemic protection.",
                 "precautions": "Use strictly as directed. Overuse causes resistance. Do not apply near harvest.",
@@ -96,10 +95,7 @@ DISEASE_SEED = [
     {
         "class_index": 1,
         "name": "Bacterial Leaf Streak",
-        "name_ta": "பாக்டீரியா இலை கோடு நோய்",
-        "name_hi": "बैक्टीरियल लीफ स्ट्रीक",
-        "name_te": "బాక్టీరియల్ లీఫ్ స్ట్రీక్",
-        "description": (
+        "name_ta": "பாக்டீரியா இலை கோடு நோய்",        "description": (
             "Bacterial Leaf Streak (BLS) is caused by Xanthomonas oryzae pv. oryzicola. "
             "It is common in warm, humid conditions and spreads through rain splash and wind. "
             "Often confused with Bacterial Leaf Blight but has distinct narrow streaks."
@@ -114,7 +110,7 @@ DISEASE_SEED = [
         "recommendations": [
             {
                 "medicine_name": "Copper Hydroxide 77% WP",
-                "dosage": "2.5g per litre of water",
+                "dosage": "2.5g per litre of water, approx. 500g per acre (200L spray)",
                 "how_to_use": "Spray thoroughly on leaves, especially the underside. Repeat every 10 days.",
                 "benefits": "Broad-spectrum bactericide. Protective and curative action.",
                 "precautions": "Avoid application during heavy rain. Use protective gear.",
@@ -124,7 +120,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Streptomycin + Copper Oxychloride (Blitox + Strep mix)",
-                "dosage": "2g Copper Oxychloride + 0.5g Streptomycin per litre",
+                "dosage": "2g Copper Oxychloride + 0.5g Streptomycin per litre, approx. 400g + 100g per acre (200L spray)",
                 "how_to_use": "Combine and spray on affected areas at first sign of disease.",
                 "benefits": "Dual-action treatment. Controls spread faster than single agent.",
                 "precautions": "Do not exceed dosage. Wear full protective equipment.",
@@ -146,8 +142,7 @@ DISEASE_SEED = [
         "class_index": 2,
         "name": "Bacterial Panicle Blight",
         "name_ta": "பாக்டீரியா கதிர் கருகல்",
-        "name_hi": "बैक्टीरियल पैनिकल ब्लाइट",
-        "name_te": "బాక్టీరియల్ పానికల్ బ్లైట్",
+        "name_si": "බැක්ටීරියල් පැනිකල් බ්ලයිට්",
         "description": (
             "Bacterial Panicle Blight is caused by Burkholderia glumae. "
             "It primarily affects rice panicles during grain filling stage. "
@@ -164,7 +159,7 @@ DISEASE_SEED = [
         "recommendations": [
             {
                 "medicine_name": "Propiconazole 25% EC",
-                "dosage": "1ml per litre of water",
+                "dosage": "1ml per litre of water, approx. 200ml per acre (200L spray)",
                 "how_to_use": "Spray at booting stage (before heading) and repeat at heading. Focus spray on panicle area.",
                 "benefits": "Systemic protection of panicle. Reduces grain sterility.",
                 "precautions": "Time application before disease establishment. Use during cool hours.",
@@ -174,7 +169,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Copper Oxychloride 50% WP",
-                "dosage": "3g per litre of water",
+                "dosage": "3g per litre of water, approx. 600g per acre (200L spray)",
                 "how_to_use": "Spray at panicle emergence. Repeat in 7 days.",
                 "benefits": "Protects florets from bacterial infection during critical stage.",
                 "precautions": "Spray in early morning. Avoid spraying on open flowers.",
@@ -197,8 +192,7 @@ DISEASE_SEED = [
         "class_index": 3,
         "name": "Blast",
         "name_ta": "நெல் கருகல் நோய்",
-        "name_hi": "ब्लास्ट रोग",
-        "name_te": "బ్లాస్ట్ వ్యాధి",
+        "name_si": "බ්ලැස්ට් රෝගය",
         "description": (
             "Rice Blast is caused by the fungus Magnaporthe oryzae. "
             "It is considered the most important fungal disease of rice worldwide. "
@@ -216,7 +210,7 @@ DISEASE_SEED = [
         "recommendations": [
             {
                 "medicine_name": "Tricyclazole 75% WP",
-                "dosage": "0.6g per litre of water (600g per hectare)",
+                "dosage": "0.6g per litre of water (600g per hectare), approx. 120g per acre (200L spray)",
                 "how_to_use": (
                     "Mix in water and spray uniformly on leaves. "
                     "First spray at tillering, second at panicle initiation. "
@@ -234,7 +228,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Isoprothiolane 40% EC (Fuji-One)",
-                "dosage": "1.5ml per litre of water",
+                "dosage": "1.5ml per litre of water, approx. 300ml per acre (200L spray)",
                 "how_to_use": "Spray 2 times — at active tillering and booting stage.",
                 "benefits": "Systemic fungicide with curative and protective action. Also improves root growth.",
                 "precautions": "Avoid contact with skin and eyes. Do not use near water bodies.",
@@ -244,7 +238,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Carbendazim 50% WP",
-                "dosage": "1g per litre of water",
+                "dosage": "1g per litre of water, approx. 200g per acre (200L spray)",
                 "how_to_use": "Spray at first sign of disease. Repeat every 10–14 days.",
                 "benefits": "Broad-spectrum systemic fungicide. Effective against multiple fungal diseases.",
                 "precautions": "Follow PHI guidelines. Do not apply near harvest.",
@@ -268,8 +262,7 @@ DISEASE_SEED = [
         "class_index": 4,
         "name": "Brown Spot",
         "name_ta": "பழுப்பு புள்ளி நோய்",
-        "name_hi": "भूरा धब्बा रोग",
-        "name_te": "బ్రౌన్ స్పాట్",
+        "name_si": "බ්‍රවුන් ස්පොට්",
         "description": (
             "Brown Spot is caused by the fungus Cochliobolus miyabeanus (Helminthosporium oryzae). "
             "It is most severe on nutrient-deficient soils, especially potassium and silicon deficient. "
@@ -295,7 +288,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Propiconazole 25% EC",
-                "dosage": "1ml per litre of water",
+                "dosage": "1ml per litre of water, approx. 200ml per acre (200L spray)",
                 "how_to_use": "Spray systemically. Absorbed and moves within plant tissue.",
                 "benefits": "Systemic curative action. Controls established infections.",
                 "precautions": "Avoid overdose — can cause phytotoxicity. Follow label instructions.",
@@ -318,8 +311,7 @@ DISEASE_SEED = [
         "class_index": 5,
         "name": "Dead Heart",
         "name_ta": "இதய வாடல் (தண்டு துளைப்பான்)",
-        "name_hi": "डेड हार्ट (तना छेदक)",
-        "name_te": "డెడ్ హార్ట్ (స్టెమ్ బోరర్)",
+        "name_si": "මරුණු හදවත",
         "description": (
             "Dead Heart is caused by stem borer larvae (Scirpophaga incertulas — Yellow Stem Borer "
             "or Scirpophaga innotata — White Stem Borer). "
@@ -337,7 +329,7 @@ DISEASE_SEED = [
         "recommendations": [
             {
                 "medicine_name": "Chlorpyrifos 20% EC",
-                "dosage": "2ml per litre of water",
+                "dosage": "2ml per litre of water, approx. 400ml per acre (200L spray)",
                 "how_to_use": "Spray on stems and lower leaf area. Spray when egg masses are visible for best control.",
                 "benefits": "Kills stem borer larvae and adults. Prevents re-infestation.",
                 "precautions": "Highly toxic — use full protective gear. Do not spray during flowering. Keep away from fish ponds.",
@@ -347,7 +339,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Carbofuran 3G (Granules)",
-                "dosage": "1kg per 100 sq meters, broadcast in standing water",
+                "dosage": "1kg per 100 sq meters, broadcast in standing water (≈40kg per acre)",
                 "how_to_use": "Apply granules in 2–3 cm standing water. Best applied at early tillering stage.",
                 "benefits": "Systemic insecticide absorbed through roots. Long residual action (3–4 weeks).",
                 "precautions": "HIGHLY TOXIC — use rubber gloves. Never apply near fish ponds or drinking water sources.",
@@ -357,7 +349,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Cartap Hydrochloride 4G",
-                "dosage": "18–20 kg per hectare as granules",
+                "dosage": "18–20 kg per hectare as granules (≈7–8 kg per acre)",
                 "how_to_use": "Broadcast in flooded field. Do not drain water for 3 days after application.",
                 "benefits": "Specific to stem borers. Lower mammalian toxicity than Carbofuran.",
                 "precautions": "Do not allow livestock near treated field. Follow PHI (30 days).",
@@ -381,8 +373,7 @@ DISEASE_SEED = [
         "class_index": 6,
         "name": "Downy Mildew",
         "name_ta": "இறங்கு பூஞ்சை நோய்",
-        "name_hi": "डाउनी मिल्ड्यू",
-        "name_te": "డౌనీ మిల్డ్యూ",
+        "name_si": "ඩවුනි මිල්ඩියු",
         "description": (
             "Downy Mildew of rice is caused by Sclerophthora macrospora (Crazy Top) "
             "or Peronosclerospora species. It is a soil and waterborne disease that "
@@ -399,7 +390,7 @@ DISEASE_SEED = [
         "recommendations": [
             {
                 "medicine_name": "Metalaxyl 35% WS (seed treatment)",
-                "dosage": "6g per kg of seed",
+                "dosage": "6g per kg of seed (treats seed for about 0.4 acre depending on sowing rate)",
                 "how_to_use": "Mix with seed before sowing. Ensures systemic protection from germination.",
                 "benefits": "Prevents systemic infection from the start. High efficacy against oomycetes.",
                 "precautions": "Use recommended dose only. Keep treated seeds separate from food.",
@@ -432,8 +423,7 @@ DISEASE_SEED = [
         "class_index": 7,
         "name": "Hispa",
         "name_ta": "நெல் இலை தின்னும் வண்டு",
-        "name_hi": "राइस हिस्पा (पत्ती खाने वाला कीड़ा)",
-        "name_te": "హిస్పా (ఆకు తినే పురుగు)",
+        "name_si": "හිස්පා",
         "description": (
             "Rice Hispa (Dicladispa armigera) is a beetle pest. "
             "Both adult beetles and larvae cause damage. "
@@ -451,7 +441,7 @@ DISEASE_SEED = [
         "recommendations": [
             {
                 "medicine_name": "Chlorpyrifos 20% EC",
-                "dosage": "2ml per litre of water",
+                "dosage": "2ml per litre of water, approx. 400ml per acre (200L spray)",
                 "how_to_use": "Spray on upper surface of leaves focusing on growing shoots. Repeat after 10 days.",
                 "benefits": "Kills adult hispa beetles quickly. Prevents further egg laying.",
                 "precautions": "Do not spray during flowering. Avoid near water. Use protective gear.",
@@ -484,8 +474,7 @@ DISEASE_SEED = [
         "class_index": 8,
         "name": "Normal (Healthy)",
         "name_ta": "ஆரோக்கியமான நெல்",
-        "name_hi": "स्वस्थ पौधा",
-        "name_te": "ఆరోగ్యకరమైన వరి",
+        "name_si": "සාමාන්‍ය (සුවපහසු)",
         "description": (
             "The paddy plant appears healthy with no visible signs of disease, "
             "pest damage, or nutrient deficiency. "
@@ -514,8 +503,7 @@ DISEASE_SEED = [
         "class_index": 9,
         "name": "Tungro",
         "name_ta": "டுங்க்ரோ வைரஸ் நோய்",
-        "name_hi": "टुंग्रो वायरस रोग",
-        "name_te": "టుంగ్రో వైరస్",
+        "name_si": "ටුංග්‍රෝ රෝගය",
         "description": (
             "Tungro is caused by two viruses working together: "
             "Rice Tungro Bacilliform Virus (RTBV) and Rice Tungro Spherical Virus (RTSV). "
@@ -533,7 +521,7 @@ DISEASE_SEED = [
         "recommendations": [
             {
                 "medicine_name": "Carbofuran 3G (Granules)",
-                "dosage": "1kg per 100 sq meters",
+                "dosage": "1kg per 100 sq meters (≈40kg per acre)",
                 "how_to_use": "Apply as granules in 2–3cm standing water at transplanting. Targets leafhopper vector.",
                 "benefits": "Controls leafhopper population which transmits tungro virus. Systemic and long-lasting.",
                 "precautions": "HIGHLY TOXIC — wear rubber gloves and boots. Never apply near fish ponds or drinking water.",
@@ -553,7 +541,7 @@ DISEASE_SEED = [
             },
             {
                 "medicine_name": "Buprofezin 25% SC",
-                "dosage": "1ml per litre of water",
+                "dosage": "1ml per litre of water, approx. 200ml per acre (200L spray)",
                 "how_to_use": "Spray at nymph stage of leafhopper for best results.",
                 "benefits": "Insect growth regulator — disrupts molting of leafhoppers. Low toxicity to mammals.",
                 "precautions": "Most effective against nymphs not adults. Apply early in infestation.",

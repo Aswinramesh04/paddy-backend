@@ -36,8 +36,7 @@ class DiseaseOut(BaseModel):
     class_index: int
     name: str
     name_ta: Optional[str]
-    name_hi: Optional[str]
-    name_te: Optional[str]
+    name_si: Optional[str]
     description: Optional[str]
     symptoms: Optional[str]
     severity: str

@@ -18,8 +18,7 @@ class Disease(Base):
     class_index: Mapped[int] = mapped_column(Integer, unique=True, nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     name_ta: Mapped[str | None] = mapped_column(String(100), nullable=True)   # Tamil
-    name_hi: Mapped[str | None] = mapped_column(String(100), nullable=True)   # Hindi
-    name_te: Mapped[str | None] = mapped_column(String(100), nullable=True)   # Telugu
+    name_si: Mapped[str | None] = mapped_column(String(100), nullable=True)   # Sinhala
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     symptoms: Mapped[str | None] = mapped_column(Text, nullable=True)
     severity: Mapped[str] = mapped_column(String(20), default="moderate")     # low|moderate|high
