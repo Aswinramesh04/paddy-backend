@@ -35,12 +35,12 @@ class DiseaseOut(BaseModel):
     id: int
     class_index: int
     name: str
-    name_ta: Optional[str]
-    name_si: Optional[str]
-    description: Optional[str]
-    symptoms: Optional[str]
+    name_ta: Optional[str] = None
+    name_si: Optional[str] = None
+    description: Optional[str] = None
+    symptoms: Optional[str] = None
     severity: str
-    image_url: Optional[str]
+    image_url: Optional[str] = None
     recommendations: List[RecommendationOut] = []
     prevention_tips: List[str] = []
 

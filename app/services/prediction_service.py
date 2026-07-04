@@ -108,7 +108,12 @@ class PredictionService:
                 id=disease_record.id,
                 class_index=disease_record.class_index,
                 name=disease_record.name,
-                name_ta=disease_record.name_ta,                description=disease_record.description,
+                    name_ta=disease_record.name_ta,
+                    name_si=(getattr(disease_record, "name_si", None)
+                             or getattr(disease_record, "name_hi", None)
+                             or getattr(disease_record, "name_te", None)
+                             or disease_record.name),
+                    description=disease_record.description,
                 symptoms=disease_record.symptoms,
                 severity=disease_record.severity,
                 image_url=disease_record.image_url,
