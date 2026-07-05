@@ -93,6 +93,10 @@ class PasswordResetRequest(BaseModel):
     email: str
 
 
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
 class PasswordResetConfirmRequest(BaseModel):
     token: str
     new_password: str

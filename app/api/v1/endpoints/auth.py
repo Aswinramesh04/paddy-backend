@@ -24,7 +24,13 @@ from app.schemas.auth import (
     RefreshTokenRequest,
     TokenResponse,
 )
-from app.schemas.auth import RegisterRequest, LoginRequest, PasswordResetRequest, PasswordResetConfirmRequest
+from app.schemas.auth import (
+    RegisterRequest,
+    LoginRequest,
+    PasswordResetRequest,
+    PasswordResetConfirmRequest,
+    VerifyEmailRequest,
+)
 from app.schemas.common import SuccessResponse
 from app.services.auth_service import AuthService
 
@@ -35,7 +41,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post(
     "/register",
-    response_model=SuccessResponse[TokenResponse],
+    response_model=SuccessResponse[dict],
     status_code=status.HTTP_201_CREATED,
     summary="Register with email and password",
 )
@@ -43,15 +49,8 @@ def register(
     payload: RegisterRequest,
     db: Session = Depends(get_db),
 ):
-    user, access_token, refresh_token = AuthService.register_user(db, payload.email, payload.password, payload.name)
-    return SuccessResponse(
-        message="Registration successful.",
-        data=TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        ),
-    )
+    user, message = AuthService.register_user(db, payload.email, payload.password, payload.name)
+    return SuccessResponse(message=message, data={"email": user.email, "is_verified": user.is_verified})
 
 
 @router.post(
@@ -73,6 +72,19 @@ def login(
             expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         ),
     )
+
+
+@router.post(
+    "/verify-email",
+    response_model=SuccessResponse[dict],
+    status_code=status.HTTP_200_OK,
+    summary="Confirm email verification token",
+)
+def verify_email(payload: VerifyEmailRequest, db: Session = Depends(get_db)):
+    ok = AuthService.confirm_email_verification(db, payload.token)
+    if not ok:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token.")
+    return SuccessResponse(message="Email verified successfully.", data={})
 
 
 @router.post(

@@ -2,11 +2,17 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
+
+if TYPE_CHECKING:
+    from app.models.email_verification import EmailVerification
+    from app.models.password_reset import PasswordReset
+    from app.models.prediction import Prediction
 
 
 class User(Base):
@@ -39,6 +45,9 @@ class User(Base):
     )
     password_resets: Mapped[list["PasswordReset"]] = relationship(  # noqa: F821
         "PasswordReset", back_populates="user", cascade="all, delete-orphan"
+    )
+    email_verifications: Mapped[list["EmailVerification"]] = relationship(  # noqa: F821
+        "EmailVerification", back_populates="user", cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:

@@ -34,6 +34,7 @@ log = get_logger(__name__)
 # ── Import all models so Base.metadata knows about them ───────
 from app.models.user import User          # noqa: F401
 from app.models.password_reset import PasswordReset  # noqa: F401
+from app.models.email_verification import EmailVerification  # noqa: F401
 from app.models.prediction import Prediction  # noqa: F401
 from app.models.shop import Shop          # noqa: F401
 from app.models.disease import Disease, Recommendation, PreventionTip  # noqa: F401

@@ -13,6 +13,7 @@ from app.core.logging import get_logger
 from app.core.security import create_access_token, create_refresh_token
 from app.core.security import hash_password, verify_password
 from app.models.password_reset import PasswordReset
+from app.models.email_verification import EmailVerification
 import secrets
 from datetime import timedelta
 from app.utils.email_utils import send_email
@@ -37,22 +38,34 @@ class AuthService:
         return access_token, refresh_token
 
     @staticmethod
-    def register_user(db: Session, email: str, password: str, name: str | None = None) -> Tuple[User, str, str]:
-        """Create a new user with email/password and return user and tokens."""
+    def register_user(db: Session, email: str, password: str, name: str | None = None) -> Tuple[User, str]:
+        """Create a new user, send a verification email, and return the user plus a message."""
         existing = db.query(User).filter(User.email == email).first()
         if existing:
             from app.core.exceptions import ConflictException
             raise ConflictException(message="User with this email already exists.")
 
-        user = User(email=email, name=name, is_active=True, is_verified=True)
+        user = User(email=email, name=name, is_active=True, is_verified=False)
         user.password_hash = hash_password(password)
         db.add(user)
         db.commit()
         db.refresh(user)
 
-        access_token = create_access_token(user.id, user.phone or user.email or "")
-        refresh_token = create_refresh_token(user.id)
-        return user, access_token, refresh_token
+        token = secrets.token_urlsafe(32)
+        expires_at = datetime.now(timezone.utc) + timedelta(minutes=60)
+        verification = EmailVerification(user_id=user.id, token=token, expires_at=expires_at, is_used=False)
+        db.add(verification)
+        db.commit()
+
+        verify_link = f"{settings.FRONTEND_URL.rstrip('/')}/verify-email?token={token}"
+        subject = "PaddyCare AI — Verify your email"
+        body = f"Thank you for registering. Please verify your email by opening this link: {verify_link}"
+        try:
+            send_email(user.email, subject, body)
+        except Exception:
+            log.exception("Failed to send verification email")
+
+        return user, "Registration successful. Please verify your email before logging in."
 
     @staticmethod
     def login_with_password(db: Session, email: str, password: str) -> Tuple[User, str, str]:
@@ -62,6 +75,9 @@ class AuthService:
             raise UnauthorizedException()
 
         if not verify_password(password, user.password_hash):
+            raise UnauthorizedException()
+
+        if not user.is_verified:
             raise UnauthorizedException()
 
         access_token = create_access_token(user.id, user.phone or user.email or "")
@@ -97,6 +113,26 @@ class AuthService:
             log.exception("Failed to send password reset email")
 
         return token
+
+    @staticmethod
+    def confirm_email_verification(db: Session, token: str) -> bool:
+        """Validate email verification token and mark the user as verified."""
+        verification = db.query(EmailVerification).filter(EmailVerification.token == token).first()
+        if not verification or verification.is_used:
+            return False
+
+        now = datetime.now(timezone.utc)
+        if verification.expires_at.replace(tzinfo=timezone.utc) < now:
+            return False
+
+        user = db.query(User).filter(User.id == verification.user_id).first()
+        if not user:
+            return False
+
+        user.is_verified = True
+        verification.is_used = True
+        db.commit()
+        return True
 
     @staticmethod
     def confirm_password_reset(db: Session, token: str, new_password: str) -> bool:
