@@ -77,6 +77,11 @@ class AuthService:
         if not verify_password(password, user.password_hash):
             raise UnauthorizedException()
 
+        # Block authentication for deactivated accounts
+        if not user.is_active:
+            raise UnauthorizedException()
+
+
         if not user.is_verified:
             raise UnauthorizedException()
 
