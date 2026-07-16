@@ -38,34 +38,70 @@ class AuthService:
         return access_token, refresh_token
 
     @staticmethod
-    def register_user(db: Session, email: str, password: str, name: str | None = None) -> Tuple[User, str]:
-        """Create a new user, send a verification email, and return the user plus a message."""
+    def register_user(
+        db: Session,
+        email: str,
+        password: str,
+        name: str | None = None,
+    ) -> Tuple[User, str]:
+        """Register a new user.
+
+        - Active account -> reject.
+        - Deactivated account -> remove old account and create a new one.
+        """
+
         existing = db.query(User).filter(User.email == email).first()
+
         if existing:
-            from app.core.exceptions import ConflictException
-            raise ConflictException(message="User with this email already exists.")
+            if existing.is_active:
+                raise ConflictException(
+                    message="User with this email already exists."
+                )
 
-        user = User(email=email, name=name, is_active=True, is_verified=False)
-        user.password_hash = hash_password(password)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+            # Re-register a previously deactivated account
+            existing.name = name
+            existing.password_hash = hash_password(password)
+            existing.is_active = True
+            existing.is_verified = False
+            existing.updated_at = datetime.now(timezone.utc)
 
-        token = secrets.token_urlsafe(32)
-        expires_at = datetime.now(timezone.utc) + timedelta(minutes=60)
-        verification = EmailVerification(user_id=user.id, token=token, expires_at=expires_at, is_used=False)
-        db.add(verification)
-        db.commit()
+            # Invalidate previous verification tokens
+            db.query(EmailVerification).filter(
+                EmailVerification.user_id == existing.id
+            ).delete(synchronize_session=False)
 
-        verify_link = f"{settings.FRONTEND_URL.rstrip('/')}/verify-email?token={token}"
-        subject = "PaddyCare AI — Verify your email"
-        body = f"Thank you for registering. Please verify your email by opening this link: {verify_link}"
-        try:
-            send_email(user.email, subject, body)
-        except Exception:
-            log.exception("Failed to send verification email")
+            db.query(PasswordReset).filter(
+                PasswordReset.user_id == existing.id
+            ).delete(synchronize_session=False)
 
-        return user, "Registration successful. Please verify your email before logging in."
+            token = secrets.token_urlsafe(32)
+            expires_at = datetime.now(timezone.utc) + timedelta(minutes=60)
+
+            verification = EmailVerification(
+                user_id=existing.id,
+                token=token,
+                expires_at=expires_at,
+                is_used=False,
+            )
+
+            db.add(verification)
+            db.commit()
+            db.refresh(existing)
+
+            verify_link = (
+                f"{settings.FRONTEND_URL.rstrip('/')}/verify-email?token={token}"
+            )
+
+            send_email(
+                existing.email,
+                "PaddyCare AI — Verify your email",
+                f"Please verify your email:\n{verify_link}",
+            )
+
+            return (
+                existing,
+                "Registration successful. Please verify your email before logging in.",
+            )
 
     @staticmethod
     def login_with_password(db: Session, email: str, password: str) -> Tuple[User, str, str]:
