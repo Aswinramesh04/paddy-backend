@@ -42,6 +42,8 @@ class UserService:
     @staticmethod
     def deactivate(db: Session, user_id: int) -> None:
         user = UserService.get_by_id(db, user_id)
-        user.is_active = False
+
+        db.delete(user)
         db.commit()
-        log.info(f"User {user_id} deactivated.")
+
+        log.info(f"User {user_id} permanently deleted.")
