@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import json
 import math
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from fastapi import Request
 from sqlalchemy.orm import Session, joinedload
@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.core.config import settings
 from app.core.exceptions import InvalidPaddyImageException
 from app.core.logging import get_logger
-from app.models.disease import Disease, PreventionTip, Recommendation
+from app.models.disease import Disease, PreventionTip
 from app.models.prediction import Prediction
 from app.services.clip_service import clip_service
 from app.schemas.prediction import (
@@ -23,11 +23,10 @@ from app.schemas.prediction import (
     PredictionHistoryItem,
     PredictionListResponse,
     PredictionResponse,
-    PreventionTipOut,
     RecommendationOut,
 )
 from app.services.image_service import get_severity_from_confidence, preprocess_image_from_path
-from app.services.model_service import DISEASE_CLASSES, model_service
+from app.services.model_service import model_service
 from app.utils.file_utils import get_image_url
 
 log = get_logger(__name__)

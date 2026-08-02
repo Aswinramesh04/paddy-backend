@@ -1,7 +1,7 @@
+import os
+
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
-import torch
-import os
 
 
 def get_cache_dir() -> str:

@@ -8,14 +8,14 @@ from typing import Tuple
 
 from sqlalchemy.orm import Session
 
+import secrets
+
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.security import create_access_token, create_refresh_token
 from app.core.security import hash_password, verify_password
 from app.models.password_reset import PasswordReset
 from app.models.email_verification import EmailVerification
-import secrets
-from datetime import timedelta
 from app.utils.email_utils import send_email
 from app.models.user import User
 from app.core.exceptions import UnauthorizedException, ConflictException

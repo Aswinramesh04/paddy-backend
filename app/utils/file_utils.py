@@ -3,7 +3,6 @@ File upload utilities: validation, saving, URL generation.
 """
 from __future__ import annotations
 
-import os
 import uuid
 from pathlib import Path
 

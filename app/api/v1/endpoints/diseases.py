@@ -7,24 +7,12 @@ GET /diseases/chat      → AI chat stub (extensible)
 """
 from __future__ import annotations
 
-# When running this module directly (e.g. `python diseases.py`) the
-# project root may not be on sys.path which causes "No module named 'app'".
-# Ensure the repository root is first on sys.path so absolute imports work.
-import os
-import sys
-if "app" not in sys.modules:
-    _project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../"))
-    if _project_root not in sys.path:
-        sys.path.insert(0, _project_root)
-
-from typing import Optional
-
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session, joinedload
 
 from app.api.v1.dependencies import get_current_user
 from app.db.database import get_db
-from app.models.disease import Disease, PreventionTip, Recommendation
+from app.models.disease import Disease, PreventionTip
 from app.models.user import User
 from app.schemas.common import SuccessResponse
 from app.schemas.disease import DiseaseDetailResponse, DiseaseListResponse, RecommendationResponse
@@ -43,10 +31,9 @@ def _build_disease_response(disease: Disease, db: Session) -> DiseaseDetailRespo
     return DiseaseDetailResponse(
         id=disease.id,
         class_index=disease.class_index,
-        english=disease.name,
-        tamil=disease.name_ta,
-        # Sinhala column may not exist in DB yet; use getattr to avoid attribute errors
-        sinhala=getattr(disease, "name_si", None),
+        name=disease.name,
+        name_ta=disease.name_ta,
+        name_si=getattr(disease, "name_si", None),
         description=disease.description,
         symptoms=disease.symptoms,
         severity=disease.severity,

@@ -54,11 +54,6 @@ class InvalidOTPException(BadRequestException):
     message = "The OTP entered is incorrect or has expired."
 
 
-class OTPExpiredException(BadRequestException):
-    error_code = "OTP_EXPIRED"
-    message = "The OTP has expired. Please request a new one."
-
-
 # ── 401 Unauthorized ──────────────────────────────────────────
 class UnauthorizedException(PaddyCareException):
     status_code = 401
@@ -120,23 +115,12 @@ class ValidationException(PaddyCareException):
 
 
 # ── 429 Rate Limit ────────────────────────────────────────────
-class RateLimitException(PaddyCareException):
-    status_code = 429
-    error_code = "RATE_LIMIT_EXCEEDED"
-    message = "Too many requests. Please try again later."
-
-
 # ── 503 Service Unavailable ───────────────────────────────────
 class ModelNotLoadedException(PaddyCareException):
     status_code = 503
     error_code = "MODEL_NOT_LOADED"
     message = "The AI model is not available. Please try again shortly."
 
-
-class SMSDeliveryException(PaddyCareException):
-    status_code = 503
-    error_code = "SMS_DELIVERY_FAILED"
-    message = "Failed to send OTP via SMS. Please try again."
 
 class InvalidPaddyImageException(BadRequestException):
     error_code = "INVALID_PADDY_IMAGE"

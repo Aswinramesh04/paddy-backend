@@ -4,8 +4,6 @@ Converts a file path or raw bytes into the tensor expected by the model.
 """
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 from PIL import Image, ImageOps
 

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -21,12 +21,6 @@ class RecommendationOut(BaseModel):
     precautions: Optional[str]
     medicine_type: str
     price_range: Optional[str]
-
-    model_config = {"from_attributes": True, "protected_namespaces": ()}
-
-
-class PreventionTipOut(BaseModel):
-    tip: str
 
     model_config = {"from_attributes": True, "protected_namespaces": ()}
 

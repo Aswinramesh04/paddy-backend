@@ -184,7 +184,7 @@ class TestDiseases:
     def test_get_disease_by_class(self, client: TestClient, auth_headers: dict):
         resp = client.get("/api/v1/diseases/by-class/0", headers=auth_headers)
         assert resp.status_code == 200
-        assert resp.json()["data"]["name"] == "Blast Disease"
+        assert resp.json()["data"]["name"] == "Bacterial Leaf Blight"
 
 
 # ── Shops ─────────────────────────────────────────────────────

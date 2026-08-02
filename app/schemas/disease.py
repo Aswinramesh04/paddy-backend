@@ -22,9 +22,9 @@ class RecommendationResponse(BaseModel):
 class DiseaseDetailResponse(BaseModel):
     id: int
     class_index: int
-    english: str
-    tamil: Optional[str]
-    sinhala: Optional[str]
+    name: str
+    name_ta: Optional[str]
+    name_si: Optional[str]
     description: Optional[str]
     symptoms: Optional[str]
     severity: str

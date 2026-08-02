@@ -2,7 +2,6 @@
 Structured logging configuration using Loguru.
 Logs rotate daily and are stored in LOG_DIR.
 """
-import os
 import sys
 from pathlib import Path
 
